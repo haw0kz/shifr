@@ -2,102 +2,89 @@
 #include <string>
 #include <windows.h>
 #include <fstream>
+#include <vector>
 using namespace std;
 
-void encryption_Pulkov(const string& key,const string& outputfile,const string& inputfile)
+void Encode(const string& Key,const string& input_file,const string& output_file)
 {
-    char symbolic;
-    ofstream out;
-    ifstream in;
-    system("chcp 1251");
-    out.open(outputfile + ".txt");
-    in.open(inputfile + ".txt");
-    int i = 0;
-    while (1)
+    int j = 0;
+    ofstream output;
+    ifstream input;
+    output.open(output_file + ".txt");
+    input.open(input_file + ".txt");
+    while (!input.eof()) 
     {
-        in.get(symbolic);
-        if (in.eof())
+        char ch = input.get();
+        if (j == Key.length()) 
         {
-            break;
+            j = 0;
         }
-        out << (unsigned char)(symbolic + key[i]);
-    
-        if (i % key.length() == 0)
-        {
-            i = 0;
-        }
-        else
-        {
-            i++;
-        }
+        char o;
+        o = ((int)ch + (int)Key[j]) % 256;
+        output << o;
+        j++;
+        input.peek();
     }
 }
 
-void decryption_Pulkov(const string& key, const string& outputfile, const string& inputfile)
+void Decode(const string& Key,const string& input_file,const string& output_file)
 {
-    char symbolic;
-    ofstream out;
-    ifstream in;
-    system("chcp 1251");
-    out.open(outputfile + ".txt");
-    in.open(inputfile + ".txt");
-    int i = 0;
-    while (1)
+    int j = 0;
+    ifstream input;
+    ofstream output;
+    output.open(output_file + ".txt");
+    input.open(input_file + ".txt");
+    while (!input.eof()) 
     {
-        in.get(symbolic);
-        if (in.eof())
+        char ch = input.get();
+        if (j == Key.length()) 
         {
-            break;
+            j = 0;
         }
-        out << (unsigned char)(symbolic + key[i]);
-
-        if (i % key.length() == 0)
-        {
-            i = 0;
-        }
-        else
-        {
-            i++;
-        }
+        char o;
+        o = ((int)ch - (int)Key[j] + 256) % 256;
+        output << o;
+        j++;
+        input.peek();
     }
 }
 
 int main()
 {
-    
+    string out, in, key, text;
     SetConsoleCP(1251);
-    SetConsoleOutputCP(1251); 
-    string key;
-    string out;
-    string in;
-    int value;
-    while (1)
-    {
-        cout << "Введите: 1 - Зашифровка файла; 2 - Расшифровка файла" << endl;
-        cin >> value;
-
-        if (value == 1)
+    SetConsoleOutputCP(1251);
+    while (true)
+    { 
+        cout << "Введите 1 - зашифровать файл; 2 - расшифровать файл" << endl;
+        int command;
+        cin >> command;
+        switch (command)
         {
-            cout << "Введите название файла, с которого считываем данные: ";
-            cin >> in;
-            cout << "Введите название файла, в которой записываем данные: ";
-            cin >> out;
-            cout << "Введите пароль: ";
-            cin >> key;
-            encryption_Pulkov(key, out, in);
-        }
-        else
-        {
-            cout << "Введите название файла, с которого считываем данные: ";
-            cin >> in;
-            cout << "Введите название файла, в которой записываем данные: ";
-            cin >> out;
-            cout << "Введите пароль: ";
-            cin >> key;
-            decryption_Pulkov(key, out, in);
-        }
+            case 1:
+            {
+                cout << "Введите название входного файла: ";
+                cin >> in;
+                cout << "Введите название выходного файла: ";
+                cin >> out;
+                cout << "Введите пароль: ";
+                cin >> key;
+                Encode(key, in, out);
+                break;
+            }
+            case 2:
+            {
+                cout << "Введите название входного файла: ";
+                cin >> in;
+                cout << "Введите название выходного файла: ";
+                cin >> out;
+                cout << "Введите пароль: ";
+                cin >> key;
+                Decode(key, in, out);
+                break;
+            }
+        }  
     }
-   return 0;
 }
 
 
